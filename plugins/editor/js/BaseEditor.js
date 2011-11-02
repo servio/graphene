@@ -19,14 +19,15 @@ WireIt.BaseEditor = function(options) {
     * Container DOM element
     * @property el
     */
-   this.el = Dom.get(options.parentEl);
+    this.el = Dom.get(options.parentEl);
+    if(this.el == undefined)
+        this.el = document.body;
 
     // set the default options
-   this.setOptions(options);
+    this.setOptions(options);
 
-   // Rendering
-   this.render();
-
+    // Rendering
+    this.render();
 };
 
 /**
@@ -148,7 +149,7 @@ WireIt.BaseEditor.prototype = {
       });
       this.alertPanel.setHeader("Message");
       this.alertPanel.setBody("<div id='alertPanelBody'></div><button id='alertPanelButton'>Ok</button>");
-      this.alertPanel.render(document.body);
+      this.alertPanel.render(this.el);
         Event.addListener('alertPanelButton','click', function() {
             this.alertPanel.hide();
         }, this, true);
