@@ -19,11 +19,10 @@ WireIt.WiringEditor = function(options) {
     this.modulesByName = {};
     WireIt.WiringEditor.superclass.constructor.call(this, options);
 
-    // LoadWirings
+    // Init Adapter
     if( this.adapter.init && YAHOO.lang.isFunction(this.adapter.init) ) {
         this.adapter.init();
     }
-    this.load();
 };
 
 lang.extend(WireIt.WiringEditor, WireIt.BaseEditor, {
