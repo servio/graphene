@@ -47,7 +47,7 @@ lang.extend(WireIt.WiringEditor, WireIt.BaseEditor, {
         this.options.layerOptions = {};
         var layerOptions = options.layerOptions || {};
 
-        this.options.layerOptions.parentEl = layerOptions.parentEl ? layerOptions.parentEl : Dom.get('center');
+        this.options.layerOptions.parentEl = layerOptions.parentEl;
         this.options.layerOptions.layerMap = YAHOO.lang.isUndefined(layerOptions.layerMap) ? true : layerOptions.layerMap;
         this.options.layerOptions.layerMapOptions = layerOptions.layerMapOptions || { parentEl: 'layerMap' };
 
@@ -77,6 +77,7 @@ lang.extend(WireIt.WiringEditor, WireIt.BaseEditor, {
 
         this.options.layerOptions.grouper = {"baseConfigFunction": baseConfigFunction };
 
+        this.toolboxEl = options.toolboxEl;
      },
 
 
@@ -99,22 +100,35 @@ lang.extend(WireIt.WiringEditor, WireIt.BaseEditor, {
         this.buildModulesList();
     },
 
+    getModuleViewEl: function() {
+        return this.moduleViewEl;
+    },
+
+    getToolboxEl: function() {
+        return this.toolboxEl;
+    },
+
+    getMiniMapEl: function(){
+        return this.miniMapEl
+    },
+
     /**
      * render the modules accordion in the left panel
      */
     renderModulesAccordion: function() {
-        // Create the modules accordion DOM if not found
-        if(!Dom.get('modulesAccordionView')) {
-            Dom.get('left').appendChild( WireIt.cn('ul', {id: 'modulesAccordionView'}) );
-            var li = WireIt.cn('li');
-            li.appendChild(WireIt.cn('h2',null,null,"Main"));
-            var d = WireIt.cn('div');
-            d.appendChild( WireIt.cn('div', {id: "module-category-main"}) );
-            li.appendChild(d);
-            Dom.get('modulesAccordionView').appendChild(li);
-        }
+        // Create the modules accordion DOM
+        this.moduleViewEl = WireIt.cn('ul', {})
+        this.getToolboxEl().appendChild(this.moduleViewEl);
 
-        this.modulesAccordionView = new YAHOO.widget.AccordionView('modulesAccordionView', this.options.modulesAccordionViewParams);
+        var li = WireIt.cn('li');
+        li.appendChild(WireIt.cn('h2',null,null,"Main"));
+        var d = WireIt.cn('div');
+        d.appendChild( WireIt.cn('div', {}) );
+        li.appendChild(d);
+        this.getModuleViewEl().appendChild(li);
+
+        // TODO:: Test Make sure AccordionView can take an HTML element as first argument
+        this.modulesAccordionView = new YAHOO.widget.AccordionView(this.getModuleViewEl(), this.options.modulesAccordionViewParams);
 
         // Open all panels
         for(var l = 1, n = this.modulesAccordionView.getPanels().length; l < n ; l++) {

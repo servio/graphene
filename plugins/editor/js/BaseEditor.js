@@ -68,7 +68,6 @@ WireIt.BaseEditor.prototype = {
      * @param {Object} options
      */
     setOptions: function(options) {
-
         /**
          * @property options
          * @type {Object}
@@ -81,33 +80,35 @@ WireIt.BaseEditor.prototype = {
          // YUI layout options
         this.options.layoutOptions = options.layoutOptions || WireIt.BaseEditor.defaultOptions.layoutOptions;
 
-         // AccordionView
-         this.options.accordionViewParams = options.accordionViewParams || WireIt.BaseEditor.defaultOptions.accordionViewParams;
+        // AccordionView
+        this.options.accordionViewParams = options.accordionViewParams || WireIt.BaseEditor.defaultOptions.accordionViewParams;
+
+        this.toolbarEl = options.toolbarEl;
+        this.propertiesFormEl = options.propertiesFormEl;
     },
 
     /**
      * Render the layout & panels
      */
     render: function() {
-
-         // Render the help panel
-        this.renderHelpPanel();
-
         /**
          * @property layout
          * @type {YAHOO.widget.Layout}
          */
-        this.layout = new widget.Layout(this.el, this.options.layoutOptions);
-        this.layout.render();
 
-         // Right accordion
-        this.renderPropertiesAccordion();
+        // Plugin should not do layout...
+        //this.layout = new widget.Layout(this.el, this.options.layoutOptions);
+        //this.layout.render();
+
+        // Right accordion
+        // Do not need the accordion
+        // this.renderPropertiesAccordion();
 
         // Render buttons
         this.renderButtons();
 
-         // Saved status
-         this.renderSavedStatus();
+        // Saved status
+        this.renderSavedStatus();
 
         // Properties Form
         this.renderPropertiesForm();
@@ -115,52 +116,46 @@ WireIt.BaseEditor.prototype = {
   },
 
     /**
-     * Render the help dialog
-     */
-    renderHelpPanel: function() {
-        /**
-         * @property helpPanel
-         * @type {YAHOO.widget.Panel}
-         */
-        this.helpPanel = new widget.Panel('helpPanel', {
-            fixedcenter: true,
-            draggable: true,
-            visible: false,
-            modal: true
-         });
-         this.helpPanel.render();
-    },
-
-    /**
      * Render the alert panel
      */
     renderAlertPanel: function() {
-
-     /**
-     * @property alertPanel
-     * @type {YAHOO.widget.Panel}
-     */
+        /**
+         * @property alertPanel
+         * @type {YAHOO.widget.Panel}
+         */
         this.alertPanel = new widget.Panel('WiringEditor-alertPanel', {
-         fixedcenter: true,
-         draggable: true,
-         width: '500px',
-         visible: false,
-         modal: true
-      });
-      this.alertPanel.setHeader("Message");
-      this.alertPanel.setBody("<div id='alertPanelBody'></div><button id='alertPanelButton'>Ok</button>");
-      this.alertPanel.render(this.el);
+            fixedcenter: true,
+            draggable: true,
+            width: '500px',
+            visible: false,
+            modal: true
+        });
+        this.alertPanel.setHeader("Message");
+        this.alertPanel.setBody("<div id='alertPanelBody'></div><button id='alertPanelButton'>Ok</button>");
+        this.alertPanel.render(this.el);
         Event.addListener('alertPanelButton','click', function() {
             this.alertPanel.hide();
         }, this, true);
     },
 
-     /**
+    getToolbarEl: function() {
+        return this.toolbarEl;
+    },
+
+    getPropertiesFormEl: function() {
+        return this.propertiesFormEl;
+    },
+
+    /**
       * Toolbar
       * @method renderButtons
       */
-     renderButtons: function() {
-        var toolbar = Dom.get('toolbar');
+    renderButtons: function() {
+        var toolbar = this.getToolbarEl();
+        if(!toolbar) {
+            console.warn("Base Editor cannot find toolbar element");
+            return;
+        }
         // Buttons :
         var newButton = new widget.Button({ label:"New", id:"WiringEditor-newButton", container: toolbar });
         newButton.on("click", this.onNew, this, true);
@@ -173,18 +168,14 @@ WireIt.BaseEditor.prototype = {
 
         var deleteButton = new widget.Button({ label:"Delete", id:"WiringEditor-deleteButton", container: toolbar });
         deleteButton.on("click", this.onDelete, this, true);
-
-        var helpButton = new widget.Button({ label:"Help", id:"WiringEditor-helpButton", container: toolbar });
-        helpButton.on("click", this.onHelp, this, true);
      },
-
 
     /**
      * @method renderSavedStatus
      */
     renderSavedStatus: function() {
         this.savedStatusEl = WireIt.cn('div', {className: 'savedStatus', title: 'Not saved'}, {display: 'none'}, "*");
-        Dom.get('toolbar').appendChild(this.savedStatusEl);
+        getToolbarEl().appendChild(this.savedStatusEl);
     },
 
      /**
@@ -210,20 +201,11 @@ WireIt.BaseEditor.prototype = {
         this.alertPanel.show();
     },
 
-     /**
-      * Create a help panel
-      * @method onHelp
-      */
-     onHelp: function() {
-        this.helpPanel.show();
-     },
-
-
     /**
      * Render the accordion using yui-accordion
      */
     renderPropertiesAccordion: function() {
-        this.accordionView = new YAHOO.widget.AccordionView('accordionView', this.options.accordionViewParams);
+        this.accordionView = new YAHOO.widget.AccordionView("INVALID", this.options.accordionViewParams);
     },
 
      /**
@@ -232,7 +214,7 @@ WireIt.BaseEditor.prototype = {
       */
      renderPropertiesForm: function() {
         this.propertiesForm = new inputEx.Group({
-           parentEl: YAHOO.util.Dom.get('propertiesForm'),
+           parentEl: this.getPropertiesFormEl(),
            fields: this.options.propertiesFields
         });
 
